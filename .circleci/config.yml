@@ -17,7 +17,7 @@ jobs:
       - run:
           name: gradle build
           command: |
-            ./gradlew build
+            ./gradlew build && ls -lrth
       - store_artifacts:
           path: ~/repo/artifacts
 workflows:
