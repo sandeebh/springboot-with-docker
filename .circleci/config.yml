@@ -4,11 +4,24 @@ version: 2.1
 orbs:
   gradle: circleci/gradle@2.2.0
   artifactory: circleci/artifactory@1.0.0
+executors:
+  gradle-executor:
+    docker:
+      - image: circleci/openjdk:8-jdk
+jobs:
+  build:
+    executor: gradle-executor
+    steps:
+      - checkout
+      - run:
+          name: gradle build
+          command: |
+            ./gradlew build
 workflows:
   checkout-build-test:
     jobs:
-      - gradle/test:
-          store_artifacts: build/reports/
+      - gradle/test
+      - build
       - artifactory/docker-publish:
           requires:
             - gradle/test
