@@ -4,38 +4,13 @@ version: 2.1
 orbs:
   gradle: circleci/gradle@2.2.0
   artifactory: circleci/artifactory@1.0.0
-
-jobs:
-  checkout_code:
-    <<: *workdirAndImage
-    steps:
-      - checkout:
-          path: ~/workspace/repo
-      - persist_to_workspace:
-          root: ~/workspace
-          paths:
-            - repo/
-  gradle/test:
-    <<: *workdirAndImage
-    steps:
-      - attach_workspace:
-          at: ~/workspace
-  artifactory/docker-publish:
-    <<: *workdirAndImage
-    steps:
-      - attach_workspace:
-          at: ~/workspace
-
 workflows:
   checkout-build-test:
     jobs:
-      - checkout_code
       - gradle/test
-          requires:
-            - checkout_code
       - artifactory/docker-publish:
           requires:
-            - gradle/test
+            - build
           docker-registry: circlecirepo.jfrog.io
           docker-steps:
             - run: docker build -t spingboot-docker .
