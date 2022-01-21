@@ -10,7 +10,7 @@ executors:
       - image: circleci/openjdk
 jobs:
   build:
-    working_directory: /tmp
+    working_directory: ~/repo
     executor: gradle-executor
     steps:
       - checkout
@@ -19,7 +19,7 @@ jobs:
           command: |
             ./gradlew build
       - store_artifacts:
-          path: /tmp/build/
+          path: ~/repo/artifacts
 workflows:
   checkout-build-test:
     jobs:
