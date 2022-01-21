@@ -1,4 +1,4 @@
-defaults: &workdirAndImage
+defaults:
   working_directory: ~/workspace
 version: 2.1
 orbs:
