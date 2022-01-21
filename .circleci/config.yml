@@ -1,7 +1,16 @@
 version: 2.1
 orbs:
   gradle: circleci/gradle@2.2.0
+  artifactory-orb: jfrog/artifactory-orb@1.0.1
 workflows:
   checkout-build-test:
     jobs:
       - gradle/test
+      - artifactory/docker-publish:
+          docker-registry: circlecirepo.jfrog.io
+          docker-steps:
+            - run: docker build -t spingboot-docker
+          docker-tag: >-
+            circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM}
+          name: Docker Publish Custom Build
+          repository: docker
