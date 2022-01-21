@@ -24,7 +24,7 @@ jobs:
       - run:
           name: gradle build
           command: |
-            ./gradlew build && cp -r build artifacts/build
+            ./gradlew build && cp -r build artifacts/build && ls -lrth artifacts && ls -lrth artifacts/build
       - persist_to_workspace:
           root: ./
           paths:
