@@ -8,16 +8,27 @@ executors:
   gradle-executor:
     docker:
       - image: circleci/openjdk
+aliases:
+  - &create-directory
+    run:
+      name: create directory
+      command: |
+        mkdir -p artifacts
 jobs:
   build:
     working_directory: ~/repo
     executor: gradle-executor
     steps:
       - checkout
+      - *create-directory
       - run:
           name: gradle build
           command: |
-            ./gradlew build && ls -lrth build
+            ./gradlew build && cp -r build artifacts/build
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - artifacts
 workflows:
   checkout-build-test:
     jobs:
