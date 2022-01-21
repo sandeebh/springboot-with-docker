@@ -17,11 +17,7 @@ jobs:
       - run:
           name: gradle build
           command: |
-            ./gradlew build && cp -r build artifacts/build
-      - persist_to_workspace:
-          root: ./
-          paths:
-            - artifacts
+            ./gradlew build && ls -lrth build
 workflows:
   checkout-build-test:
     jobs:
