@@ -7,6 +7,8 @@ workflows:
     jobs:
       - gradle/test
       - artifactory/docker-publish:
+          requires:
+            - gradle/test
           docker-registry: circlecirepo.jfrog.io
           docker-steps:
             - run: docker build -t spingboot-docker .
