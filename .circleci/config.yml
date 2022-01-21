@@ -7,7 +7,7 @@ orbs:
 executors:
   gradle-executor:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: cimg/openjdk:17.0.1
 jobs:
   build:
     executor: gradle-executor
