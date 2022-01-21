@@ -8,6 +8,7 @@ workflows:
   checkout-build-test:
     jobs:
       - gradle/test
+          store_artifacts: build/reports/
       - artifactory/docker-publish:
           requires:
             - gradle/test
