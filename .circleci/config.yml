@@ -8,6 +8,9 @@ executors:
   gradle-executor:
     docker:
       - image: circleci/openjdk
+  docker-publisher:
+    docker:
+      - image: circleci/buildpack-deps:stretch
 aliases:
   - &create-directory
     run:
@@ -29,23 +32,26 @@ jobs:
           root: ./
           paths:
             - artifacts
-  artifactory/docker-publish:
-    executor: gradle-executor
+  publish-to-artifactory-hub:
+    executor: docker-publisher
     steps:
       - attach_workspace:
           at: ./
+      - setup_remote_docker
+      - run: pwd && ls -lrth
+      - run: docker login "${ARTIFACTORY_URL}" -u "${ARTIFACTORY_USER}" -p "${ARTIFACTORY_PASSWORD}"
+      - run: docker build -t springboot-docker .
+      - run:
+          name: Tag and push to artifactory hub
+          command:
+            docker tag springboot-docker circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM}
+
+
 workflows:
   checkout-build-test:
     jobs:
       - gradle/test
       - build
-      - artifactory/docker-publish:
+      - publish-to-artifactory-hub:
           requires:
             - build
-          docker-registry: circlecirepo.jfrog.io
-          docker-steps:
-            - run: ls -lrth artifacts && docker build -t spingboot-docker .
-          docker-tag: >-
-            circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM}
-          name: Docker Publish Custom Build
-          repository: docker
