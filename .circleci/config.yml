@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Tag and push to artifactory hub
           command:
-            docker tag springboot-docker circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM}
+            docker tag springboot-docker circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM} && docker push circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM}
 
 
 workflows:
