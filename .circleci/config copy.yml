@@ -29,12 +29,6 @@ jobs:
           root: ./
           paths:
             - artifacts
-  artifactory/docker-publish:
-    steps:
-      - attach_workspace:
-          at: ./
-
-
 workflows:
   checkout-build-test:
     jobs:
