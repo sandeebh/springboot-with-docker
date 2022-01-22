@@ -29,15 +29,17 @@ jobs:
           root: ./
           paths:
             - artifacts
+  artifactory/docker-publish:
+    executor: gradle-executor
+    steps:
+      - attach_workspace:
+          at: ./
 workflows:
   checkout-build-test:
     jobs:
       - gradle/test
       - build
       - artifactory/docker-publish:
-          steps:
-            - attach_workspace:
-                at: ./
           requires:
             - build
           docker-registry: circlecirepo.jfrog.io
