@@ -20,6 +20,11 @@ aliases:
       name: create directory
       command: |
         mkdir -p artifacts
+  - &get-helmchart-version
+    run:
+      name: get the helm-chart version
+      command: |
+        helmversion=$(helm show chart kubernetes/springapp | grep version | cut -d: -f 2 | tr -d ' ')
 jobs:
   build:
     working_directory: ~/repo
@@ -49,11 +54,15 @@ jobs:
           name: Tag and push to artifactory hub
           command:
             docker tag springboot-docker circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM} && docker push circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM}
-  lint-helm-chart:
+  lint-publish-helm-chart:
     executor: helm
     steps:
       - checkout
       - run: helm lint kubernetes/springapp
+      - run: helm plugin install https://github.com/belitre/helm-push-artifactory-plugin
+      - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
+      - *get-helmchart-version
+      - run: tar -czvf  springapp-${helmversion}.tgz kubernetes/springapp/
 
 workflows:
   checkout-build-test:
