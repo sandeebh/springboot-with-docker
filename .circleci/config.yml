@@ -24,7 +24,7 @@ aliases:
     run:
       name: get the helm-chart version
       command: |
-        helmversion=$(helm show chart kubernetes/springapp | grep version | cut -d: -f 2 | tr -d ' ')
+        export helmversion=$(helm show chart kubernetes/springapp | grep version | cut -d: -f 2 | tr -d ' ')
 jobs:
   build:
     working_directory: ~/repo
@@ -64,7 +64,7 @@ jobs:
       - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
       - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
       - *get-helmchart-version
-      - run: cd kubernetes/ && tar -czvf  springapp-${helmversion}.tgz springapp/ && ls -lrth
+      - run: echo $helmversion && cd kubernetes/ && tar -czvf  springapp-${helmversion}.tgz springapp/ && ls -lrth
       - run: helm push-artifactory springapp-${helmversion}.tgz https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
 
 workflows:
