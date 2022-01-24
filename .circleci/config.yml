@@ -66,6 +66,12 @@ jobs:
       - *get-helmchart-version
       - run: cd kubernetes/ && tar -czvf  springapp.tgz springapp/ && ls -lrth
       - run: cd kubernetes && helm push-artifactory springapp.tgz https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
+  Deploy-helm-chart:
+    executor: helm
+    steps:
+      - checkout
+      - run: cd kubernetes/springapp
+      - run: helm upgrade --install --set image.repository="circlecirepo.jfrog.io/docker/spingboot-docker" --set image.tag="1.0-130" springapp .
 
 workflows:
   checkout-build-test:
@@ -77,3 +83,6 @@ workflows:
       - lint-publish-helm-chart:
           requires:
             - publish-to-artifactory-hub
+      - Deploy-helm-chart:
+          requires:
+            - lint-publish-helm-chart
