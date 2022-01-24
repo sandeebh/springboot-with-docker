@@ -65,7 +65,7 @@ jobs:
       - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
       - *get-helmchart-version
       - run: cd kubernetes/ && tar -czvf  springapp.tgz springapp/ && ls -lrth
-      - run: ls -lrth && ls -lrth springapp.tgz && helm push-artifactory springapp.tgz https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
+      - run: cd kubernetes && helm push-artifactory springapp.tgz https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
 
 workflows:
   checkout-build-test:
