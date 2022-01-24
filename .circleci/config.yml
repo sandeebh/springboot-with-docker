@@ -59,6 +59,7 @@ jobs:
     steps:
       - checkout
       - run: helm lint kubernetes/springapp
+      - run: yum install -y git
       - run: helm plugin install https://github.com/belitre/helm-push-artifactory-plugin
       - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
       - *get-helmchart-version
