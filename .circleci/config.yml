@@ -20,6 +20,7 @@ jobs:
       - checkout
       - run: |
           # echo Hello, World!
+          ls -ltra
   example-job:
     docker:
       # replace with your preferred image
