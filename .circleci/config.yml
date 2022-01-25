@@ -27,7 +27,7 @@ jobs:
     steps:
       - docker/build:
           image: POC-springboot 
-          lint-dockerfile: true 
+          lint-dockerfile: false
 
 workflows:
   my-custom-workflow:
