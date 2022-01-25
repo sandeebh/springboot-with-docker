@@ -22,9 +22,7 @@ jobs:
           # echo Hello, World!
           ls -ltra
   example-job:
-    docker:
-      # replace with your preferred image
-      - image: cimg/base:stable
+    executor: my-custom-executor
     steps:
       - checkout
       - docker/build:
