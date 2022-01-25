@@ -50,7 +50,6 @@ jobs:
       - setup_remote_docker
       - run: pwd && ls -lrth
       - run: docker build -t springboot-docker .
-      - run:
   lint-publish-helm-chart:
     executor: helm
     steps:
