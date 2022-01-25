@@ -10,20 +10,27 @@ executors:
           password: $DOCKER_HUB_PASSWORD
 orbs:
    gradle: circleci/gradle@2.2.0
+   docker: circleci/docker@2.0.1
+
 
 jobs:
   pco-circleci:
-
     executor: my-custom-executor
     steps:
       - checkout
       - run: |
           # echo Hello, World!
+  example-job:
+    docker:
+      # replace with your preferred image
+      - image: cimg/base:stable
+    steps:
+      - docker/build:
+          image: POC-springboot 
+          lint-dockerfile: true 
 
 workflows:
   my-custom-workflow:
     jobs:
-      - pco-circleci
-      - gradle/run:
-            app_src_directory: src 
-            command: docker build 
+      -  pco-circleci
+      -  example-job
