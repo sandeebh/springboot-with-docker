@@ -1,90 +1,29 @@
-defaults:
-  working_directory: ~/workspace
 version: 2.1
-orbs:
-  gradle: circleci/gradle@2.2.0
-  artifactory: circleci/artifactory@1.0.0
-  kubernetes: circleci/kubernetes@1.0.0
 executors:
-  gradle-executor:
+  my-custom-executor:
     docker:
-      - image: circleci/openjdk
-  docker-publisher:
-    docker:
-      - image: circleci/buildpack-deps:stretch
-  helm:
-    docker:
-      - image: sibipro/sibi-helm:0.2
-aliases:
-  - &create-directory
-    run:
-      name: create directory
-      command: |
-        mkdir -p artifacts
-  - &get-helmchart-version
-    run:
-      name: get the helm-chart version
-      command: |
-        export helmversion=$(helm show chart kubernetes/springapp | grep version | cut -d: -f 2 | tr -d ' ')
+      - image: cimg/base:stable
+        auth:
+          # ensure you have first added these secrets
+          # visit app.circleci.com/settings/project/github/sandeebh/springboot-with-docker/environment-variables
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+orbs:
+   gradle: circleci/gradle@2.2.0
+
 jobs:
-  build:
-    working_directory: ~/repo
-    executor: gradle-executor
+  pco-circleci:
+
+    executor: my-custom-executor
     steps:
       - checkout
-      - *create-directory
-      - run:
-          name: gradle build
-          command: |
-            ./gradlew build && cp -r build artifacts/build && ls -lrth artifacts && ls -lrth artifacts/build
-      - persist_to_workspace:
-          root: ./
-          paths:
-            - artifacts
-  publish-to-artifactory-hub:
-    executor: docker-publisher
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
-      - setup_remote_docker
-      - run: pwd && ls -lrth
-      - run: docker login "${ARTIFACTORY_URL}" -u "${ARTIFACTORY_USER}" -p "${ARTIFACTORY_PASSWORD}"
-      - run: docker build -t springboot-docker .
-      - run:
-          name: Tag and push to artifactory hub
-          command:
-            docker tag springboot-docker circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM} && docker push circlecirepo.jfrog.io/docker/spingboot-docker:1.0-${CIRCLE_BUILD_NUM}
-  lint-publish-helm-chart:
-    executor: helm
-    steps:
-      - checkout
-      - run: helm lint kubernetes/springapp
-      - run: yum install -y git wget
-      - run: helm plugin install https://github.com/belitre/helm-push-artifactory-plugin --version v1.0.0
-      - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
-      - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
-      - *get-helmchart-version
-      - run: cd kubernetes/ && tar -czvf  springapp.tgz springapp/ && ls -lrth
-      - run: cd kubernetes && helm push-artifactory springapp.tgz https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
-  Deploy-helm-chart:
-    executor: helm
-    steps:
-      - checkout
-      - kubernetes/install-kubeconfig:
-          kubeconfig: KUBECONFIG_DATA
-      - run: cd kubernetes/springapp && helm upgrade --install --set image.repository="circlecirepo.jfrog.io/docker/spingboot-docker" --set image.tag="1.0-130" springapp .
+      - run: |
+          # echo Hello, World!
 
 workflows:
-  checkout-build-test:
+  my-custom-workflow:
     jobs:
-      - build
-      - publish-to-artifactory-hub:
-          requires:
-            - build
-      - lint-publish-helm-chart:
-          requires:
-            - publish-to-artifactory-hub
-      - Deploy-helm-chart:
-          requires:
-            - lint-publish-helm-chart
+      - pco-circleci
+      - gradle/run:
+            app_src_directory: src 
+            command: docker build 
