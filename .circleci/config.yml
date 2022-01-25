@@ -71,8 +71,9 @@ jobs:
     executor: helm
     steps:
       - checkout
+      - run: echo ${KUBECONFIG_DATA}
       - kubernetes/install-kubeconfig:
-          kubeconfig: KUBECONFIG_DATA
+          kubeconfig: ${KUBECONFIG_DATA}
       - run: cd kubernetes/springapp && helm upgrade --install --set image.repository="circlecirepo.jfrog.io/docker/spingboot-docker" --set image.tag="1.0-130" springapp .
 
 workflows:
