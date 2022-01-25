@@ -50,26 +50,7 @@ jobs:
       - setup_remote_docker
       - run: pwd && ls -lrth
       - run: docker build -t springboot-docker .
-  lint-publish-helm-chart:
-    executor: helm
-    steps:
-      - checkout
-      - run: helm lint kubernetes/springapp
-      - run: yum install -y git wget
-      - run: helm plugin install https://github.com/belitre/helm-push-artifactory-plugin --version v1.0.0
-      - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
-      - run: helm repo add helm https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
-      - *get-helmchart-version
-      - run: cd kubernetes/ && tar -czvf  springapp.tgz springapp/ && ls -lrth
-      - run: cd kubernetes && helm push-artifactory springapp.tgz https://circlecirepo.jfrog.io/artifactory/helm-local/ --username "${ARTIFACTORY_USER}"  --password "${ARTIFACTORY_PASSWORD}"
-  Deploy-helm-chart:
-    executor: helm
-    steps:
-      - checkout
-      - kubernetes/install-kubeconfig:
-          kubeconfig: KUBECONFIG_DATA
-      - run: cd kubernetes/springapp && helm upgrade --install --set image.repository="circlecirepo.jfrog.io/docker/spingboot-docker" --set image.tag="1.0-130" springapp .
-
+  
 workflows:
   checkout-build-test:
     jobs:
@@ -77,9 +58,4 @@ workflows:
       - publish-to-artifactory-hub:
           requires:
             - build
-      - lint-publish-helm-chart:
-          requires:
-            - publish-to-artifactory-hub
-      - Deploy-helm-chart:
-          requires:
-            - lint-publish-helm-chart
+
