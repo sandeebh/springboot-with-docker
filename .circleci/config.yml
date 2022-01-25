@@ -4,6 +4,7 @@ version: 2.1
 orbs:
   gradle: circleci/gradle@2.2.0
   artifactory: circleci/artifactory@1.0.0
+  kubernetes: circleci/kubernetes@1.3.0
 executors:
   gradle-executor:
     docker:
@@ -70,6 +71,8 @@ jobs:
     executor: helm
     steps:
       - checkout
+      - kubernetes/install-kubeconfig:
+          kubeconfig: KUBECONFIG_DATA
       - run: cd kubernetes/springapp && helm upgrade --install --set image.repository="circlecirepo.jfrog.io/docker/spingboot-docker" --set image.tag="1.0-130" springapp .
 
 workflows:
